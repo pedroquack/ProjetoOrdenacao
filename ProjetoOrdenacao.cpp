@@ -63,8 +63,6 @@ void exibirAlunos(Aluno *alunos, int quantidadeAlunos){
 	for(int i = 0; i < quantidadeAlunos; i++){
 		printf("| %10d | %30s | %5.2f | %8d |\n", alunos[i].matricula, alunos[i].nome, alunos[i].nota, alunos[i].faltas);
 	}
-	system("pause");
-	system("cls");
 }
 
 void ordenar(Aluno *alunos, int quantidadeAlunos, int metodoOrdenacao, bool (*funcaoComparar)(Aluno, Aluno)){
@@ -82,47 +80,73 @@ void ordenar(Aluno *alunos, int quantidadeAlunos, int metodoOrdenacao, bool (*fu
 	switch(metodoOrdenacao){
 		case 1:
 			bubbleSort(tempAlunos, quantidadeAlunos, funcaoComparar, &metricas);
-		break;			
+		break;
+		case 2:
+			selectionSort(tempAlunos, quantidadeAlunos, funcaoComparar, &metricas);
+		break;
+		case 3:
+			insertionSort(tempAlunos, quantidadeAlunos, funcaoComparar, &metricas);
+		break;
+		case 4:
+			quickSort(tempAlunos, quantidadeAlunos, funcaoComparar, &metricas);
+		break;
+		case 5:
+			mergeSort(tempAlunos, quantidadeAlunos, funcaoComparar, &metricas);
+		break;
 	}
 	
+	exibirAlunos(tempAlunos, quantidadeAlunos);
 	printf("---- METRICAS ----\n");
 	printf("Comparacoes: %lld\n", metricas.comparacoes);
 	printf("Movimentacoes: %lld\n", metricas.movimentacoes);
 	printf("Tempo de execucao: %f\n", metricas.tempo_execucao);
-	exibirAlunos(tempAlunos, quantidadeAlunos);
-}
-
-void preencherAlunos(Aluno **alunos, int quantidadeAlunos){
-	*alunos = (Aluno*) malloc(quantidadeAlunos * sizeof(Aluno));
-
-    if (alunos == NULL) {
-        printf("Erro ao alocar memória!\n");
-        return;
-    }
-
-    Aluno *a = *alunos;
-
-    a[0] = (Aluno){202301, "Ana Silva", 9.5, 2};
-    a[1] = (Aluno){202302, "Bruno Souza", 9.5, 5};
-    a[2] = (Aluno){202303, "Carlos Oliveira", 10.0, 1};
-    a[3] = (Aluno){202304, "Daniel Costa", 4.5, 15};
-    a[4] = (Aluno){202305, "Eduarda Lima", 7.0, 3};
-    a[5] = (Aluno){202306, "Fernanda Rocha", 8.5, 4};
-    a[6] = (Aluno){202307, "Gabriel Santos", 9.5, 8};
-    a[7] = (Aluno){202308, "Helena Farias", 0.0, 25};
-    a[8] = (Aluno){202309, "Igor Batista", 10.0, 0};
-    a[9] = (Aluno){202310, "Julia Almeida", 9.5, 5};
+	system("pause");
+	system("cls");
 }
 
 int main(){
+	
 	int opcao;
 	bool (*funcaoComparar)(Aluno, Aluno) = compararNotaDecrescente;
-	
-	Aluno *alunos;
-	int quantidadeAlunos = 10;
 	int criterioOrdenacao = 3;
 	int metodoOrdenacao = 1;
-	preencherAlunos(&alunos, quantidadeAlunos);
+	Aluno *alunos = NULL;
+	int quantidadeAlunos = 0;
+	
+	FILE *arquivo_ptr = fopen("alunos.txt", "r");
+	char buffer[200];
+	
+	if(arquivo_ptr == NULL){
+		printf("Houve um erro ao ler o arquivo de alunos...\n");
+		system("pause");
+		return 0;
+	}
+	
+	//Primeiro tem que pegar a quantidade de alunos que tem no arquivo
+	while (fgets(buffer, sizeof(buffer), arquivo_ptr)) {
+        quantidadeAlunos++;
+    }
+	
+	//Isso volta a leitura do arquivo pro começo, pra dai sim começar a alocar os alunos
+	rewind(arquivo_ptr);
+	
+	//Aloca a memoria dos alunos de acordo com a quantidade
+	alunos = (Aluno *) malloc(quantidadeAlunos * sizeof(Aluno));
+    if (alunos == NULL) {
+        printf("Erro ao alocar memoria dos alunos!\n");
+        fclose(arquivo_ptr);
+        return 1;
+    }
+    
+    //Pra cada aluno alocado, pega o valor da linha no arquivo e adiciona no aluno
+    for (int i = 0; i < quantidadeAlunos; i++) {
+        fscanf(arquivo_ptr, "%d;%49[^;];%f;%d\n", 
+               &alunos[i].matricula, 
+               alunos[i].nome, 
+               &alunos[i].nota, 
+               &alunos[i].faltas);
+    }
+
 	do{
 		opcao = menu(criterioOrdenacao);
 		
@@ -148,4 +172,7 @@ int main(){
 			break;
 		}
 	}while(opcao != 0);
+	
+	fclose(arquivo_ptr);
+    free(alunos);
 }
