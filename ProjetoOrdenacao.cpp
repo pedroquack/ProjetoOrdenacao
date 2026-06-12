@@ -65,6 +65,26 @@ void exibirAlunos(Aluno *alunos, int quantidadeAlunos){
 	}
 }
 
+void salvarAlunos(Aluno *alunos, int quantidadeAlunos){
+    FILE *arquivo_ptr = fopen("alunos_ordenados.txt", "w");
+
+    if(arquivo_ptr == NULL){
+        printf("Erro ao criar o arquivo alunos_ordenados.txt\n");
+        return;
+    }
+
+    for(int i = 0; i < quantidadeAlunos; i++){
+        fprintf(arquivo_ptr, "%d;%s;%.2f;%d\n",
+                alunos[i].matricula,
+                alunos[i].nome,
+                alunos[i].nota,
+                alunos[i].faltas);
+    }
+
+    fclose(arquivo_ptr);
+}
+
+
 void ordenar(Aluno *alunos, int quantidadeAlunos, int metodoOrdenacao, bool (*funcaoComparar)(Aluno, Aluno)){
 	
 	Aluno *tempAlunos = (Aluno*) malloc(quantidadeAlunos * sizeof(Aluno));
@@ -96,6 +116,7 @@ void ordenar(Aluno *alunos, int quantidadeAlunos, int metodoOrdenacao, bool (*fu
 	}
 	
 	exibirAlunos(tempAlunos, quantidadeAlunos);
+	salvarAlunos(tempAlunos, quantidadeAlunos);
 	printf("---- METRICAS ----\n");
 	printf("Comparacoes: %lld\n", metricas.comparacoes);
 	printf("Movimentacoes: %lld\n", metricas.movimentacoes);
@@ -108,7 +129,7 @@ int main(){
 	
 	int opcao;
 	bool (*funcaoComparar)(Aluno, Aluno) = compararNotaDecrescente;
-	int criterioOrdenacao = 3;
+	int criterioOrdenacao = 2;
 	int metodoOrdenacao = 1;
 	Aluno *alunos = NULL;
 	int quantidadeAlunos = 0;
@@ -168,7 +189,8 @@ int main(){
 				ordenar(alunos, quantidadeAlunos, metodoOrdenacao, funcaoComparar);
 			break;
 			case 3:
-				exibirAlunos(alunos, quantidadeAlunos);	
+				exibirAlunos(alunos, quantidadeAlunos);
+				system("pause");
 			break;
 		}
 	}while(opcao != 0);

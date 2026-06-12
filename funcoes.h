@@ -41,6 +41,7 @@ bool compararNotaDecrescente(Aluno alunoA, Aluno alunoB){
 	}
 }
 
+//Descrescente
 bool compararFaltas(Aluno alunoA, Aluno alunoB){
 	if(alunoA.faltas < alunoB.faltas){
 		return true;
@@ -134,7 +135,7 @@ void insertionSort(Aluno *alunos, int quantidadeAlunos, bool(*funcaoComparar)(Al
 	metricas->movimentacoes = 0;
 	clock_t inicio = clock();
 	
-	for(int i = 1; i < quantidadeAlunos - 1; i ++){
+	for(int i = 1; i < quantidadeAlunos; i ++){
 		Aluno chave = alunos[i];
 		metricas->movimentacoes++;
 		int j = i - 1;
